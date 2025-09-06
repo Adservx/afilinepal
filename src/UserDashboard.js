@@ -69,7 +69,7 @@ function UserDashboard({ token, user, onLogout }) {
                 rel="noopener noreferrer"
                 className="view-btn"
               >
-                View Product
+                Shop Now
               </a>
             </div>
           </div>

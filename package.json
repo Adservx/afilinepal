@@ -20,7 +20,8 @@
     "start": "node server/index.js",
     "build": "react-scripts build",
     "server": "node server/index.js",
-    "dev": "concurrently \"npm run server\" \"react-scripts start\""
+    "dev": "concurrently \"npm run server\" \"react-scripts start\"",
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
