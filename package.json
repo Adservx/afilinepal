@@ -11,17 +11,17 @@
     "express": "^4.18.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^8.0.0",
-    "puppeteer": "^24.19.0",
+    "puppeteer": "^21.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "node server/index.js",
-    "build": "react-scripts build",
+    "build": "react-scripts build && npx puppeteer browsers install chrome",
     "server": "node server/index.js",
     "dev": "concurrently \"npm run server\" \"react-scripts start\"",
-    "postinstall": "npx puppeteer browsers install chrome || npx @puppeteer/browsers install chrome@stable"
+
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
