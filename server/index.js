@@ -4,10 +4,14 @@ const cors = require('cors');
 const puppeteer = require('puppeteer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../build')));
 
 // MongoDB connection
 mongoose.connect('mongodb+srv://imserv67:gogo%40%23123@cluster0.igvyhft.mongodb.net/affiliate-store?retryWrites=true&w=majority&appName=Cluster0');
@@ -185,6 +189,11 @@ app.delete('/api/products/:id', auth, adminAuth, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// Catch-all handler: send back React's index.html file
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
 mongoose.connection.on('connected', () => {
