@@ -21,7 +21,7 @@
     "build": "react-scripts build",
     "server": "node server/index.js",
     "dev": "concurrently \"npm run server\" \"react-scripts start\"",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "postinstall": "npx puppeteer browsers install chrome || npx @puppeteer/browsers install chrome@stable"
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {

@@ -103,8 +103,7 @@ app.post('/api/scrape', auth, adminAuth, async (req, res) => {
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu'
-      ],
-      executablePath: process.env.NODE_ENV === 'production' ? '/opt/render/.cache/puppeteer/chrome/linux-*/chrome-linux*/chrome' : undefined
+      ]
     });
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
