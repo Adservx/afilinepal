@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://imserv67:gogo%40%23123@cluster0.igvyhft.mongodb.net/affiliate-store?retryWrites=true&w=majority&appName=Cluster0');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://imserv67:gogo%40%23123@cluster0.igvyhft.mongodb.net/affiliate-store?retryWrites=true&w=majority&appName=Cluster0');
 
 // User schema
 const userSchema = new mongoose.Schema({
@@ -32,7 +32,7 @@ const auth = (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'Access denied' });
   
   try {
-    const decoded = jwt.verify(token, 'secretkey');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secretkey');
     req.user = decoded;
     next();
   } catch (error) {
@@ -59,7 +59,7 @@ app.post('/api/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ email, password: hashedPassword, role: role || 'user' });
     await user.save();
-    const token = jwt.sign({ userId: user._id, role: user.role }, 'secretkey');
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET || 'secretkey');
     res.json({ token, user: { id: user._id, email: user.email, role: user.role } });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -73,7 +73,7 @@ app.post('/api/login', async (req, res) => {
     if (!user || !await bcrypt.compare(password, user.password)) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: user._id, role: user.role }, 'secretkey');
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET || 'secretkey');
     res.json({ token, user: { id: user._id, email: user.email, role: user.role } });
   } catch (error) {
     res.status(400).json({ error: error.message });
