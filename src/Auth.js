@@ -15,7 +15,7 @@ function Auth({ onLogin }) {
 
     try {
       const endpoint = isLogin ? '/api/login' : '/api/signup';
-      const response = await axios.post(`http://localhost:5000${endpoint}`, {
+      const response = await axios.post(endpoint, {
         email,
         password,
         ...(isLogin ? {} : { role: 'user' })

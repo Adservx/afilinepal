@@ -12,7 +12,7 @@ function AdminDashboard({ token, user, onLogout }) {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products', {
+      const response = await axios.get('/api/products', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(response.data);
@@ -27,7 +27,7 @@ function AdminDashboard({ token, user, onLogout }) {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/scrape', { url }, {
+      await axios.post('/api/scrape', { url }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUrl('');
@@ -40,7 +40,7 @@ function AdminDashboard({ token, user, onLogout }) {
 
   const deleteProduct = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+      await axios.delete(`/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchProducts();
