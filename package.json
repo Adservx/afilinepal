@@ -18,7 +18,7 @@
   },
   "scripts": {
     "start": "node server/index.js",
-    "build": "react-scripts build",
+    "build": "npx puppeteer browsers install chrome && react-scripts build",
     "server": "node server/index.js",
     "dev": "concurrently \"npm run server\" \"react-scripts start\""
   },
