@@ -2,10 +2,10 @@ services:
   - type: web
     name: ecommerce-admin
     env: node
-    buildCommand: npm ci && npx puppeteer browsers install chrome && npm run build:react
+    buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: SERVER_PORT
-        value: 10000
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: true
+      - key: PUPPETEER_EXECUTABLE_PATH
+        value: /opt/render/.cache/puppeteer/chrome/linux-*/chrome-linux*/chrome
