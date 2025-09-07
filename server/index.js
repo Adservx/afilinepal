@@ -15,7 +15,9 @@ app.use(cors({
 app.use(express.json());
 
 // Serve static files from React build
-app.use(express.static(path.join(__dirname, '../build')));
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../build')));
+}
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://imserv67:gogo%40%23123@cluster0.igvyhft.mongodb.net/affiliate-store?retryWrites=true&w=majority&appName=Cluster0');
@@ -205,7 +207,11 @@ app.delete('/api/products/:id', auth, adminAuth, async (req, res) => {
 
 // Catch-all handler: send back React's index.html file
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build/index.html'));
+  if (process.env.NODE_ENV === 'production') {
+    res.sendFile(path.join(__dirname, '../build/index.html'));
+  } else {
+    res.status(404).json({ error: 'Not found' });
+  }
 });
 
 mongoose.connection.on('connected', () => {
