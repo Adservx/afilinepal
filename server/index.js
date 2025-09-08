@@ -103,11 +103,7 @@ app.post('/api/scrape', auth, adminAuth, async (req, res) => {
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process'
+        '--disable-dev-shm-usage'
       ]
     });
     const page = await browser.newPage();
