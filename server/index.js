@@ -2,7 +2,45 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const puppeteer = require('puppeteer');
+const axios = require('axios');
+const cheerio = require('cheerio');
+
+const scrapeWithCheerio = async (url) => {
+  try {
+    const { data } = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      timeout: 10000
+    });
+    
+    const $ = cheerio.load(data);
+    
+    const selectors = {
+      title: ['h1[data-spm-anchor-id]', '.pdp-mod-product-badge-title', 'h1', '.product-title', '[data-testid="product-title"]'],
+      price: ['.pdp-price', '.price-current', '.notranslate', '.price', '.product-price', '[data-testid="price"]'],
+      description: ['.html-content', '.pdp-product-desc', '.description', '.product-description'],
+      image: ['.gallery-preview-panel img', '.pdp-mod-common-image img', 'img[alt*="product"]', '.product-image img']
+    };
+    
+    const getContent = (selectorArray) => {
+      for (const selector of selectorArray) {
+        const element = $(selector).first();
+        if (element.length) return element.text().trim() || element.attr('src') || element.attr('data-src');
+      }
+      return '';
+    };
+    
+    return {
+      title: getContent(selectors.title),
+      price: getContent(selectors.price),
+      description: getContent(selectors.description),
+      image: getContent(selectors.image)
+    };
+  } catch (error) {
+    throw new Error(`Scraping failed: ${error.message}`);
+  }
+};
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -20,7 +58,17 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://imserv67:gogo%40%23123@cluster0.igvyhft.mongodb.net/affiliate-store?retryWrites=true&w=majority&appName=Cluster0');
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://imserv67:gogo%40%23123@cluster0.igvyhft.mongodb.net/affiliate-store?retryWrites=true&w=majority&appName=Cluster0');
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+};
+
+connectDB();
 
 // User schema
 const userSchema = new mongoose.Schema({
@@ -98,72 +146,7 @@ const adminAuth = (req, res, next) => {
 app.post('/api/scrape', auth, adminAuth, async (req, res) => {
   try {
     const { url } = req.body;
-    const browser = await puppeteer.launch({ 
-      headless: 'new',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage'
-      ]
-    });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    const productData = await page.evaluate(() => {
-      const getTextContent = (selectors) => {
-        for (const selector of selectors) {
-          const element = document.querySelector(selector);
-          if (element) return element.textContent.trim();
-        }
-        return '';
-      };
-
-      const getImageSrc = (selectors) => {
-        for (const selector of selectors) {
-          const element = document.querySelector(selector);
-          if (element) return element.src || element.getAttribute('data-src') || element.getAttribute('data-lazy-src');
-        }
-        return '';
-      };
-
-      return {
-        title: getTextContent([
-          'h1[data-spm-anchor-id]',
-          '.pdp-mod-product-badge-title',
-          'h1',
-          '.product-title',
-          '[data-testid="product-title"]',
-          '.title'
-        ]),
-        price: getTextContent([
-          '.pdp-price',
-          '.price-current',
-          '.notranslate',
-          '.price',
-          '.product-price',
-          '[data-testid="price"]',
-          '.cost'
-        ]),
-        description: getTextContent([
-          '.html-content',
-          '.pdp-product-desc',
-          '.description',
-          '.product-description',
-          '[data-testid="description"]'
-        ]),
-        image: getImageSrc([
-          '.gallery-preview-panel img',
-          '.pdp-mod-common-image img',
-          'img[alt*="product"]',
-          '.product-image img',
-          'img'
-        ])
-      };
-    });
-
-    await browser.close();
+    const productData = await scrapeWithCheerio(url);
 
     if (!productData.title && !productData.price) {
       throw new Error('Could not extract product data from this URL');
@@ -210,13 +193,7 @@ app.get('*', (req, res) => {
   }
 });
 
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB');
-});
 
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
-});
 
 const PORT = process.env.PORT || process.env.SERVER_PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
