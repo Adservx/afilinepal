@@ -16,26 +16,46 @@ const scrapeWithCheerio = async (url) => {
     
     const $ = cheerio.load(data);
     
-    const selectors = {
-      title: ['h1[data-spm-anchor-id]', '.pdp-mod-product-badge-title', 'h1', '.product-title', '[data-testid="product-title"]'],
-      price: ['.pdp-price', '.price-current', '.notranslate', '.price', '.product-price', '[data-testid="price"]'],
-      description: ['.html-content', '.pdp-product-desc', '.description', '.product-description'],
-      image: ['.gallery-preview-panel img', '.pdp-mod-common-image img', 'img[alt*="product"]', '.product-image img']
+    const priceSelectors = [
+      '.pdp-price', '.price-current', '.notranslate', '.price', '.product-price',
+      '[data-testid="price"]', '.cost', '.sale-price', '.current-price',
+      '.price-now', '.price-display', '.price-value', '.amount', '.currency',
+      'span[class*="price"]', 'div[class*="price"]', '.price-box .price',
+      '.price-wrapper .price', '[class*="Price"]', '[id*="price"]',
+      '.money', '.price-range', '.regular-price', '.a-price-whole',
+      '.a-price .a-offscreen', '.price-current-label', '.price-sales'
+    ];
+    
+    const getPrice = () => {
+      for (const selector of priceSelectors) {
+        const elements = $(selector);
+        for (let i = 0; i < elements.length; i++) {
+          const text = $(elements[i]).text().trim();
+          if (text && /[\$£€¥₹₽]|\d+[.,]\d+/.test(text)) {
+            return text;
+          }
+        }
+      }
+      return '';
     };
     
     const getContent = (selectorArray) => {
       for (const selector of selectorArray) {
         const element = $(selector).first();
-        if (element.length) return element.text().trim() || element.attr('src') || element.attr('data-src');
+        if (element.length) {
+          const text = element.text().trim();
+          const src = element.attr('src') || element.attr('data-src');
+          return text || src || '';
+        }
       }
       return '';
     };
     
     return {
-      title: getContent(selectors.title),
-      price: getContent(selectors.price),
-      description: getContent(selectors.description),
-      image: getContent(selectors.image)
+      title: getContent(['h1[data-spm-anchor-id]', '.pdp-mod-product-badge-title', 'h1', '.product-title', '[data-testid="product-title"]']),
+      price: getPrice(),
+      description: getContent(['.html-content', '.pdp-product-desc', '.description', '.product-description']),
+      image: getContent(['.gallery-preview-panel img', '.pdp-mod-common-image img', 'img[alt*="product"]', '.product-image img'])
     };
   } catch (error) {
     throw new Error(`Scraping failed: ${error.message}`);
