@@ -15,12 +15,14 @@ function AdminDashboard({ token, user, onLogout }) {
 
   const fetchProducts = async () => {
     try {
+      console.log('Admin fetching from:', `${API_URL}/api/products`);
       const response = await axios.get(`${API_URL}/api/products`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching products:', error.response?.data || error.message);
+      setProducts([]);
     }
   };
 
@@ -37,7 +39,8 @@ function AdminDashboard({ token, user, onLogout }) {
       setPrice('');
       fetchProducts();
     } catch (error) {
-      alert('Error scraping product: ' + error.response?.data?.error);
+      console.error('Scrape error:', error.response?.data || error.message);
+      alert('Error scraping product: ' + (error.response?.data?.error || error.message));
     }
     setLoading(false);
   };

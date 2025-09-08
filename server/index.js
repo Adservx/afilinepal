@@ -67,8 +67,10 @@ const path = require('path');
 
 const app = express();
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? true : ['http://localhost:3000', 'http://127.0.0.1:3000'],
-  credentials: true
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
@@ -188,9 +190,12 @@ app.post('/api/scrape', auth, adminAuth, async (req, res) => {
 // Get all products (public)
 app.get('/api/products', async (req, res) => {
   try {
+    console.log('Fetching products...');
     const products = await Product.find().sort({ createdAt: -1 });
+    console.log(`Found ${products.length} products`);
     res.json(products);
   } catch (error) {
+    console.error('Products fetch error:', error);
     res.status(500).json({ error: error.message });
   }
 });

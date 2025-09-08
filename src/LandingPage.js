@@ -12,10 +12,12 @@ function LandingPage({ user, onShowAuth, onLogout }) {
 
   const fetchProducts = async () => {
     try {
+      console.log('Fetching from:', `${API_URL}/api/products`);
       const response = await axios.get(`${API_URL}/api/products`);
       setProducts(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching products:', error.response?.data || error.message);
+      setProducts([]);
     }
   };
 
