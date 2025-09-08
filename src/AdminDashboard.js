@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 function AdminDashboard({ token, user, onLogout }) {
   const [url, setUrl] = useState('');
+  const [price, setPrice] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -12,7 +15,7 @@ function AdminDashboard({ token, user, onLogout }) {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/api/products', {
+      const response = await axios.get(`${API_URL}/api/products`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(response.data);
@@ -27,10 +30,11 @@ function AdminDashboard({ token, user, onLogout }) {
 
     setLoading(true);
     try {
-      await axios.post('/api/scrape', { url }, {
+      await axios.post(`${API_URL}/api/scrape`, { url, price }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUrl('');
+      setPrice('');
       fetchProducts();
     } catch (error) {
       alert('Error scraping product: ' + error.response?.data?.error);
@@ -40,7 +44,7 @@ function AdminDashboard({ token, user, onLogout }) {
 
   const deleteProduct = async (id) => {
     try {
-      await axios.delete(`/api/products/${id}`, {
+      await axios.delete(`${API_URL}/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchProducts();
@@ -68,6 +72,16 @@ function AdminDashboard({ token, user, onLogout }) {
             placeholder="Paste ecommerce product URL here..."
             required
           />
+          <div className="price-input-wrapper">
+            <span className="currency-prefix">Rs.</span>
+            <input
+              type="text"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Enter price (optional)"
+              className="price-input"
+            />
+          </div>
           <button type="submit" disabled={loading}>
             {loading ? 'Scraping...' : 'Add Product'}
           </button>

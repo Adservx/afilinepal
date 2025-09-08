@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Auth.css';
 
-function Auth({ onLogin }) {
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+function Auth({ onLogin, onBack }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +17,7 @@ function Auth({ onLogin }) {
 
     try {
       const endpoint = isLogin ? '/api/login' : '/api/signup';
-      const response = await axios.post(endpoint, {
+      const response = await axios.post(`${API_URL}${endpoint}`, {
         email,
         password,
         ...(isLogin ? {} : { role: 'user' })
@@ -33,6 +35,9 @@ function Auth({ onLogin }) {
   return (
     <div className="auth-container">
       <div className="auth-form">
+        {onBack && (
+          <button className="back-btn" onClick={onBack}>← Back</button>
+        )}
         <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
         <form onSubmit={handleSubmit}>
           <input

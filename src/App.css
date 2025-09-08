@@ -62,6 +62,55 @@ header h1 {
   box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.login-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.login-btn:hover::before {
+  left: 100%;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
 .url-form {
   background: #2d3748;
   padding: 2rem;
@@ -93,6 +142,45 @@ header h1 {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.price-input-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 200px;
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  background: #1a202c;
+  transition: border-color 0.2s ease;
+}
+
+.price-input-wrapper:focus-within {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.currency-prefix {
+  padding: 0.875rem 0 0.875rem 1rem;
+  color: #6c757d;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.price-input {
+  flex: 1;
+  padding: 0.875rem 1rem 0.875rem 0.5rem;
+  border: none;
+  background: transparent;
+  color: #e9ecef;
+  font-size: 1rem;
+  min-width: unset;
+}
+
+.price-input:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
 .url-form button {
@@ -317,7 +405,7 @@ header h1 {
     padding: 1rem;
   }
   
-  .user-info {
+  .user-info, .auth-buttons {
     justify-content: center;
   }
   
@@ -330,6 +418,10 @@ header h1 {
   }
   
   .url-form input {
+    min-width: unset;
+  }
+  
+  .price-input-wrapper {
     min-width: unset;
   }
   

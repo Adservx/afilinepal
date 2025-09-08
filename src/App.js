@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Auth from './Auth';
 import AdminDashboard from './AdminDashboard';
-import UserDashboard from './UserDashboard';
+import LandingPage from './LandingPage';
 import './App.css';
 
 function App() {
@@ -19,6 +19,7 @@ function App() {
       return null;
     }
   });
+  const [showAuth, setShowAuth] = useState(false);
 
   const handleLogin = (newToken, newUser) => {
     try {
@@ -26,6 +27,7 @@ function App() {
       localStorage.setItem('user', JSON.stringify(newUser));
       setToken(newToken);
       setUser(newUser);
+      setShowAuth(false);
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
@@ -42,19 +44,15 @@ function App() {
     setUser(null);
   };
 
-
-
-  if (!token) {
-    return <Auth onLogin={handleLogin} />;
+  if (showAuth) {
+    return <Auth onLogin={handleLogin} onBack={() => setShowAuth(false)} />;
   }
 
-  if (user?.role === 'admin') {
+  if (token && user?.role === 'admin') {
     return <AdminDashboard token={token} user={user} onLogout={handleLogout} />;
-  } else if (user?.role === 'user') {
-    return <UserDashboard token={token} user={user} onLogout={handleLogout} />;
   }
 
-  return <div>Loading...</div>;
+  return <LandingPage user={user} onShowAuth={() => setShowAuth(true)} onLogout={handleLogout} />;
 }
 
 export default App;

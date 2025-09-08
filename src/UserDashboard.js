@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 function UserDashboard({ token, user, onLogout }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,7 +22,7 @@ function UserDashboard({ token, user, onLogout }) {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/api/products', {
+      const response = await axios.get(`${API_URL}/api/products`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(response.data);

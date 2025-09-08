@@ -165,15 +165,16 @@ const adminAuth = (req, res, next) => {
 // Scrape product details (admin only)
 app.post('/api/scrape', auth, adminAuth, async (req, res) => {
   try {
-    const { url } = req.body;
+    const { url, price } = req.body;
     const productData = await scrapeWithCheerio(url);
 
-    if (!productData.title && !productData.price) {
+    if (!productData.title && !productData.price && !price) {
       throw new Error('Could not extract product data from this URL');
     }
 
     const product = new Product({
       ...productData,
+      price: price ? `Rs. ${price}` : productData.price,
       url
     });
 
@@ -184,8 +185,8 @@ app.post('/api/scrape', auth, adminAuth, async (req, res) => {
   }
 });
 
-// Get all products
-app.get('/api/products', auth, async (req, res) => {
+// Get all products (public)
+app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
