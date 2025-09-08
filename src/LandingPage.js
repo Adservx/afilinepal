@@ -52,7 +52,7 @@ function LandingPage({ user, onShowAuth, onLogout }) {
               <p className="price">{product.price}</p>
               <p className="description">{product.description}</p>
               <a 
-                href={product.url} 
+                href={product.affiliateLink || product.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="view-btn"

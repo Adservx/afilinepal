@@ -6,6 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL || '';
 function AdminDashboard({ token, user, onLogout }) {
   const [url, setUrl] = useState('');
   const [price, setPrice] = useState('');
+  const [affiliateLink, setAffiliateLink] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -32,11 +33,12 @@ function AdminDashboard({ token, user, onLogout }) {
 
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/api/scrape`, { url, price }, {
+      await axios.post(`${API_URL}/api/scrape`, { url, price, affiliateLink }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUrl('');
       setPrice('');
+      setAffiliateLink('');
       fetchProducts();
     } catch (error) {
       console.error('Scrape error:', error.response?.data || error.message);
@@ -85,6 +87,12 @@ function AdminDashboard({ token, user, onLogout }) {
               className="price-input"
             />
           </div>
+          <input
+            type="url"
+            value={affiliateLink}
+            onChange={(e) => setAffiliateLink(e.target.value)}
+            placeholder="Paste affiliate link here..."
+          />
           <button type="submit" disabled={loading}>
             {loading ? 'Scraping...' : 'Add Product'}
           </button>

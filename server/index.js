@@ -123,6 +123,7 @@ const productSchema = new mongoose.Schema({
   image: String,
   description: String,
   url: String,
+  affiliateLink: String,
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -167,7 +168,7 @@ const adminAuth = (req, res, next) => {
 // Scrape product details (admin only)
 app.post('/api/scrape', auth, adminAuth, async (req, res) => {
   try {
-    const { url, price } = req.body;
+    const { url, price, affiliateLink } = req.body;
     const productData = await scrapeWithCheerio(url);
 
     if (!productData.title && !productData.price && !price) {
@@ -177,7 +178,8 @@ app.post('/api/scrape', auth, adminAuth, async (req, res) => {
     const product = new Product({
       ...productData,
       price: price ? `Rs. ${price}` : productData.price,
-      url
+      url,
+      affiliateLink
     });
 
     await product.save();
